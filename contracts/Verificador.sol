@@ -1,38 +1,40 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity^0.8.15;
+pragma solidity >=0.7.0 <0.9.0;
 
 contract Verificacio{
 
-    //1. Elements del contracte
+    //1. Contract attributes
 
-    // Primer identifiquem el owner del document
+    // First, the owner of the document
     address public owner;
 
-    // Nom del document
+    // Document information
     string public payer;
     string public filename;
+
+    // Trust attributes
     string public hash;
     string public link;
 
-    // validators del document
+    // Validators
     address[] public validators;
-    // No validators del document
+    // Deniers
     address[] public denegators;
 
-    // Mapa de comprovació de les validations amb un comentari
+    // Map with users that validated the document
     mapping (address=>bool) public validations;
-    // Mapa de comprovació de les denegations amb un comentari
+    // Map with users that don't trust the document
     mapping (address=>bool) public denegations;
 
 
-    //3. VALIDAR
+    //3. VALIDATE
     event Validation(address indexed validador, string asset);
 
-    function validate() public {
-        require(owner != tx.origin, "El owner no pot validar el seu asset");
-        require(!validations[tx.origin], "Validador repetit");
-        require(!denegations[tx.origin], "No pots validar i denegar alhora");
+    function validate() external {
+        require(owner != tx.origin, "Owner cannot validate his own document");
+        require(!validations[tx.origin], "Repeated validator");
+        require(!denegations[tx.origin], "You cannot validate and deny at the same time");
         validators.push(tx.origin);
         validations[tx.origin] = true;
 
@@ -40,13 +42,13 @@ contract Verificacio{
 
     }
 
-    //4. DENEGAR
+    //4. DENY
     event Denegation(address indexed denegador, string asset);
 
-    function denegate() public {
-        require(owner != tx.origin, "El owner no pot validar el seu asset");
-        require(!denegations[tx.origin], "Denegador repetit");
-        require(!validations[tx.origin], "No pots validar i denegar alhora");
+    function denegate() external {
+        require(owner != tx.origin, "Owner cannot deny his own document");
+        require(!denegations[tx.origin], "Repeated denegator");
+        require(!validations[tx.origin], "You cannot validate and deny at the same time");
         denegators.push(tx.origin);
         denegations[tx.origin] = true;
 
@@ -54,9 +56,9 @@ contract Verificacio{
 
     }
 
-    function checkValidation() public view returns(bool){
-        uint256 den = nDenegations();
-        uint256 val = nValidations();
+    function checkValidation() external view returns(bool){
+        uint256 den = denegators.length;
+        uint256 val = validators.length;
 
         return (den == 0 && val >= 5) || (den != 0 && val>(den*5));
 
@@ -65,53 +67,43 @@ contract Verificacio{
 
 
     //Getters
-    function hasValidated(address _user) public view returns(bool) {
+    function hasValidated(address _user) external view returns(bool) {
         require(owner != _user);
         return validations[_user];
     }
 
-    function hasDenied(address _user) public view returns(bool) {
+    function hasDenied(address _user) external view returns(bool) {
         require(owner != _user);
         return denegations[_user];
     }
 
-    function getOwner() external view returns(address){
-        return owner;
-    }
-
-    function getFilename() external view returns(string memory){
-        return filename;
-    }
-
-    function nValidations() public view returns(uint256) {
+    function nValidations() external view returns(uint256) {
         return validators.length;
     }
 
-    function nDenegations() public view returns(uint256) {
+    function nDenegations() external view returns(uint256) {
         return denegators.length;
     }
 
     //SETTERS
 
-    function setOwner(address user) public {
+    function setOwner(address user) external {
         owner = user;
     }
 
-    function setFilename(string memory name) public {
+    function setFilename(string memory name) external {
         filename = name;
     }
 
-    function setPayer(string memory _payer) public {
+    function setPayer(string memory _payer) external {
         payer = _payer;
     }
 
-
-
-    function setHashDoc(string memory _hash) public {
+    function setHashDoc(string memory _hash) external {
         hash = _hash;
     }  
 
-    function setLinkDoc(string memory _link) public {
+    function setLinkDoc(string memory _link) external {
         link = _link;
     }  
 

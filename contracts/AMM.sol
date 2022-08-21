@@ -38,6 +38,8 @@ contract DEX {
 
         function initialize(address token_address, uint256 token_amount) external payable {
                 require(total_liquidity == 0);
+                require(token_amount > 0);
+                require(msg.value > 0);
 
                 fee = 0;
                 tokenERC = IERC20(token_address);
@@ -94,6 +96,7 @@ contract DEX {
         }
 
         function deposit() external payable {
+                require(msg.value > 0);
                 uint256 token_amount = ((msg.value * tokenERC.balanceOf(address(this))) / (address(this).balance - msg.value));
                 uint256 liquidity_added = (msg.value * total_liquidity) / (address(this).balance - msg.value);
 
@@ -147,7 +150,7 @@ contract DEX {
                 return address(this).balance;
         }
 
-        function distributeFee() public{
+        function distributeFee() external{
                 uint256 profit = (fee * 3) / 1000;
                 (bool success, ) = tx.origin.call{value: profit}("");
                 require(success, "Transfer failed.");

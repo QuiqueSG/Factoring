@@ -22,6 +22,7 @@ contract Factoring {
 
     //Tokenization
     Tokfa public tokenitzacio;
+    uint256 public tokensInit;
 
     //Liquidity pool
     DEX public LP;
@@ -49,7 +50,7 @@ contract Factoring {
 
     function DOCnewFile(string memory _filename, uint256 _value, uint _days) external {
         value = _value;
-        expDays = _days;
+        expDays = block.timestamp + _days;
 
         verificador.setFilename(_filename);
         verificador.setOwner(msg.sender);
@@ -61,7 +62,7 @@ contract Factoring {
 
     //Important data that helps to validate
     
-    function DOCsetHash(string memory hash) public onlyOwner{
+    function DOCsetHash(string memory hash) external onlyOwner{
         verificador.setHashDoc(hash);
         hasHash = true;
         if (hasLink && hasHash){
@@ -69,11 +70,11 @@ contract Factoring {
         }
     }
 
-    function DOCgetHash() public view returns(string memory){
+    function DOCgetHash() external view returns(string memory){
         return verificador.hash();
     }
 
-    function DOCsetURL(string memory link) public onlyOwner{
+    function DOCsetURL(string memory link) external onlyOwner{
         verificador.setLinkDoc(link);
         hasLink = true;
         if (hasLink && hasHash){
@@ -81,14 +82,14 @@ contract Factoring {
         }
     }
     
-    function DOCgetURL() public view returns(string memory){
+    function DOCgetURL() external view returns(string memory){
         return verificador.link();
     }
 
     //1. VERIFY
     event DOCValidated(address indexed validator, string asset);
 
-    function DOCvalidate() public{
+    function DOCvalidate() external{
         verificador.validate();
 
         if (verificador.checkValidation()){
@@ -99,13 +100,14 @@ contract Factoring {
     }
 
     event DOCDenegated(address indexed denegator, string asset);
-    function DOCdeny() public {
+    function DOCdeny() external {
         verificador.denegate();
 
         emit DOCDenegated(msg.sender, verificador.filename());
     }
 
-//-------- TOKENIZATION ---------
+
+    //2. TOKENIZATION
 
     /*
     STEPS:
@@ -118,12 +120,13 @@ contract Factoring {
     event StartLP(uint256 assetX, uint256 assetY);
     
 
-    function start(uint256 quants_tokens) public payable {
+    function start(uint256 quants_tokens) external payable {
         collateral = msg.value;
         
         //1.
-        tokenitzacio = new Tokfa(quants_tokens * 4);
+        tokenitzacio = new Tokfa(quants_tokens);
         uint256 token_amount = quants_tokens * 10**uint(tokenitzacio.decimals());
+        tokensInit = token_amount;
 
         //2.
         tokenitzacio.approve(tx.origin, address(LP), tokenitzacio.totalSupply());
@@ -145,7 +148,7 @@ contract Factoring {
     
     event BuyERC(uint256 payed, uint256 tokens_received);
     
-    function LPbuyERC() public payable {
+    function LPbuyERC() external payable {
         LP.ethToErc{value:msg.value}();
         
         emit BuyERC(msg.value, LP.tokens_received());
@@ -165,11 +168,14 @@ contract Factoring {
  //----------DEPOSIT------------
 
     event DepositLP(uint256 liquidity);
+    function LPdeposit() external payable {
+        uint256 tokens_added = tokenAmount(msg.value);
+        if (tokens_added > TFAmybalance()){
+            tokenitzacio.generate(tokens_added);
+        }
 
-    function LPdeposit() public payable {
         tokenitzacio.approve(tx.origin, address(LP), tokenAmount(msg.value));
         LP.deposit{value:msg.value}();
-
         emit DepositLP(LP.liq_added());
     }
 
@@ -190,12 +196,16 @@ contract Factoring {
 
 //----------FINAL FASE------------
 
-    function FINgetProfit() public {
+    function FINgetProfit() external {
         LPgetLiquidity(intFee.mul(LP.invested(tx.origin)));
     }
 
-    function FINarbit(uint256 new_tokens) public onlyOwner{
-        tokenitzacio.generate(new_tokens);
+    function FINarbit() external {
+        uint256 new_tokens = tokensInit - LP.getTokenBalance();
+        if (new_tokens > TFAmybalance()){
+            tokenitzacio.generate(new_tokens);
+        }
+        LPbuyETH(new_tokens);
     }
 
 //----------INTERFACES------------
@@ -203,33 +213,33 @@ contract Factoring {
 
     //LIQUIDITY POOL INTERFACE
 
-    function LPtokens() public view returns(uint256){
+    function LPtokens() external view returns(uint256){
         return LP.getTokenBalance();
     }
 
-    function LPether()  public view returns(uint256){
+    function LPether()  external view returns(uint256){
         return LP.getBalance();
     }
 
-    function LPliquidity() public view returns(uint256){
+    function LPliquidity() external view returns(uint256){
         return LP.total_liquidity();
     }
 
-    function LPpriceForERC(uint256 eth) public view returns(uint256){
+    function LPpriceForERC(uint256 eth) external view returns(uint256){
         return LP.priceERC(eth);
     }
 
-    function LPpriceForETH(uint256 tokens) public view returns(uint256){
+    function LPpriceForETH(uint256 tokens) external view returns(uint256){
         return LP.priceETH(tokens);
     }
 
  //----------CHECKERS------------
 
-    function LPadded(uint256 eth) public view returns(uint256, uint256){
+    function LPadded(uint256 eth) external view returns(uint256, uint256){
         return LP.liquidityAdded(eth);
     }
 
-    function LPsubstracted(uint256 valor) public view returns(uint256, uint256){
+    function LPsubstracted(uint256 valor) external view returns(uint256, uint256){
         return LP.liquiditySubstracted(valor);
     }
     
@@ -241,14 +251,31 @@ contract Factoring {
         return tokenitzacio.balanceOf(tx.origin);
     }
 
-    function TFAsupply() public view returns(uint256){
+    function TFAbalance(address account) public view returns(uint256){
+        return tokenitzacio.balanceOf(account);
+    }
+
+    function TFAsupply() external view returns(uint256){
         return tokenitzacio.totalSupply();
+    }
+
+    function ETHmybalance() public view returns(uint256){
+        return tx.origin.balance;
+    }
+
+    function ETHbalance(address account) public view returns(uint256){
+        return account.balance;
     }
 
 
     //INTEREST INTERFACE
-    function INTrate() public view returns(uint256){
+    function INTrate() external view returns(uint256){
         return intFee.rate();
     }
+
+
+
+
+
 }
     

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity^0.8.15;
+pragma solidity >=0.7.0 <0.9.0;
+
 
 contract Interest {
 
@@ -9,6 +10,11 @@ contract Interest {
     uint256 private dec;
     bool private collateralOnce;
     bool private verifiedOnce;
+    uint256 private constant MAX = 100000000000000000000;
+    uint256 private constant MIN = 3000000000000000000;
+    uint256 private REF = 1250000000000000000;
+
+
 
     constructor(uint256 _init){
         dec = 18;
@@ -17,33 +23,42 @@ contract Interest {
         verifiedOnce = false;
     }
 
-    function adjustIntVerify() public {
+    function adjustIntVerify() external {
         if (!verifiedOnce){
             reduction();
             verifiedOnce = true;
         }
     }
 
-    function adjustIntDoc() public {
+    function adjustIntDoc() external {
         reduction();
     }
 
-    function adjustIntCol(uint256 val, uint256 col) public {
+    function adjustIntCol(uint256 val, uint256 col) external {
         require(!collateralOnce, "Already executed");
         uint256 valueDec = (val * 10 ** dec);
-        uint256 colDec = (col * 10 ** dec);
         uint256 actualRef = valueDec/col;
-        uint256 ref = 1250000000000000000;
 
-        if (ref <= actualRef){
-            rate += (actualRef-ref);
+        if (REF <= actualRef){
+            rate += (actualRef-REF);
+            if (rate > MAX) {
+                rate = MAX;
+            }
         }
         else{
-            uint256 x = (rate*125) / (val*100);
-            uint256 colRes = (valueDec * 80)/100;
-            uint256 difCol = colDec - colRes;
-            uint256 res = (x * difCol)/(10**dec);
-            rate -= res;
+            
+            uint256 dos = (2 * 10 ** dec);
+            uint256 res = (REF*col)/val;
+            if (res > dos) {
+                rate = MIN;
+            }
+            else{
+                rate = (rate * (dos - res)) / (10**dec);
+            }
+
+            if (rate < MIN){
+                rate = MIN;
+            }
         }
 
         collateralOnce = true;
@@ -53,7 +68,7 @@ contract Interest {
         rate = (rate * 7) /8;
     }
 
-    function mul(uint256 amount) public view returns(uint256){
+    function mul(uint256 amount) external view returns(uint256){
         return amount + ((amount * rate)/100)/(10**dec);
 
     }
