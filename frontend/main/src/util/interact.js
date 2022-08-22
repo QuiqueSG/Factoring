@@ -1,7 +1,7 @@
 const Web3 = require('web3');
 const web3 = new Web3(window.ethereum);
 const contractABI = require("../contract-abi.json");
-const contractAddress = "0x4f359E2b813707756918C10CC737273995DDc84e";
+const contractAddress = "0xb4832a163AdB06bC9D827f8B373Fa1CedddeAeF9";
 let account = "0x0000000000000000000000000000000000000000" ;
 
 export const factoringContract = new web3.eth.Contract(
