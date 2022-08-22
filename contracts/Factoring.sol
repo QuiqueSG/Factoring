@@ -15,7 +15,7 @@ contract Factoring {
     //Verified document
     Verificacio public verificador;
     uint256 public value;
-    uint public expDays;
+    uint256 public expDays;
 
     //Collateral
     uint256 public collateral;
@@ -46,19 +46,22 @@ contract Factoring {
 
 
     //Setting new File
-    event NewDocument(address indexed owner, string filename, uint256 value, uint daysRemaining);
+    event NewDocument(address indexed owner, string filename, uint256 value, uint256 daysRemaining);
 
-    function DOCnewFile(string memory _filename, uint256 _value, uint _days) external {
+    function DOCnewFile(string memory _filename, uint256 _value, uint256 _days) external {
         value = _value;
-        expDays = block.timestamp + _days;
+        expDays = date(_days);
 
         verificador.setFilename(_filename);
         verificador.setOwner(msg.sender);
 
-        emit NewDocument(msg.sender, _filename, _value, _days);
+        emit NewDocument(msg.sender, _filename, _value, expDays);
 
     }
 
+    function date(uint256 _days) internal view returns(uint256){
+        return block.timestamp + (86400 * _days);
+    }
 
     //Important data that helps to validate
     
@@ -223,27 +226,7 @@ contract Factoring {
 
     function LPliquidity() external view returns(uint256){
         return LP.total_liquidity();
-    }
-
-    function LPpriceForERC(uint256 eth) external view returns(uint256){
-        return LP.priceERC(eth);
-    }
-
-    function LPpriceForETH(uint256 tokens) external view returns(uint256){
-        return LP.priceETH(tokens);
-    }
-
- //----------CHECKERS------------
-
-    function LPadded(uint256 eth) external view returns(uint256, uint256){
-        return LP.liquidityAdded(eth);
-    }
-
-    function LPsubstracted(uint256 valor) external view returns(uint256, uint256){
-        return LP.liquiditySubstracted(valor);
-    }
-    
-    
+    }    
     
     //TOKENIZATION INTERFACE
 
@@ -271,6 +254,21 @@ contract Factoring {
     //INTEREST INTERFACE
     function INTrate() external view returns(uint256){
         return intFee.rate();
+    }
+
+    //REINIT
+
+    function restart() external onlyOwner {
+        LP.finish();
+        LP = new DEX();
+        verificador = new Verificacio();
+        intFee = new Interest(15);
+        value = 0;
+        expDays = 0;
+        collateral = 0;
+        tokensInit = 0;
+        hasLink = false;
+        hasHash = false;
     }
 
 

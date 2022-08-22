@@ -1,7 +1,7 @@
 const Web3 = require('web3');
 const web3 = new Web3(window.ethereum);
 const contractABI = require("../contract-abi.json");
-const contractAddress = "0x24915546547577Af2ac615d8CCc23E0d4283a2D3";
+const contractAddress = "0x4f359E2b813707756918C10CC737273995DDc84e";
 let account = "0x0000000000000000000000000000000000000000" ;
 
 export const factoringContract = new web3.eth.Contract(
@@ -197,6 +197,11 @@ export const txBuyTFA = async (ether) => {
     return transactionPayable(ether, factoringContract.methods.LPbuyERC().encodeABI());
 };
 
+export const swapETH = async (tokens) => {
+    const tokensTFA = web3.utils.toWei(tokens, 'ether');
+    return transaction(factoringContract.methods.LPbuyETH(tokensTFA).encodeABI());    
+};
+
 export const txDeposit = async (ether) => {
     return transactionPayable(ether, factoringContract.methods.LPdeposit().encodeABI());
 }
@@ -206,15 +211,14 @@ export const txWithdraw = async (ether) => {
     return transactionPayable(factoringContract.methods.LPgetLiquidity(wei).encodeABI());
 }
 
-export const swapETH = async (tokens) => {
-    const tokensTFA = web3.utils.toWei(tokens, 'ether');
-    return transaction(factoringContract.methods.LPbuyETH(tokensTFA).encodeABI());    
-};
-
 export const arbitPool = async () => {
     return transaction(factoringContract.methods.FINarbit().encodeABI());
 }
 
 export const getProfit = async () => {
     return transaction(factoringContract.methods.FINgetProfit().encodeABI());
+}
+
+export const restart = async () => {
+    return transaction(factoringContract.methods.restart().encodeABI());
 }

@@ -9,6 +9,7 @@ import {
   loadPoolETH as loadPoolETH,
   loadPoolTFA as loadPoolTFA,
   getCurrentWalletConnected,
+  restart,
 } from "./util/interact.js";
 
 const FactoringMain = () => {
@@ -21,6 +22,7 @@ const FactoringMain = () => {
   const [userEther, setUserEther] = useState("0 ETH"); //default message
   const [poolEther, setPoolEther] = useState("0"); //default message
   const [poolTokens, setPoolTokens] = useState("0"); //default message
+  const [expDate, setExpDate] = useState("");
 
   let dir;
   let started = false;
@@ -68,7 +70,10 @@ const FactoringMain = () => {
     setPoolEther(ethPool);
 
     const tokensPool = await loadPoolTFA();
-    setPoolTokens(tokensPool);   
+    setPoolTokens(tokensPool);
+    
+    const rate = await loadCurrentRate();
+    setRate(rate);
   }
 
   async function addSmartContractListener() { //TODO: implement
@@ -78,7 +83,10 @@ const FactoringMain = () => {
         }
         else{
           const myEther = await loadCurrentUserETH(dir);
-          setUserEther(myEther); 
+          setUserEther(myEther);
+          console.log(data.returnValues.daysRemaining); 
+          const date = new Date(data.returnValues.daysRemaining * 1000);
+          setExpDate(date.toLocaleDateString())
           setStatus("✅ New Document added! " + data.returnValues.filename);
         }
     });
@@ -183,6 +191,14 @@ const FactoringMain = () => {
 
   };
 
+  async function reinit(){
+    await restart();
+    await reload();
+    setPoolTokens("0");
+    setPoolEther("0");
+
+  }
+
   //the UI of our component
   return (
     <div id="container">
@@ -200,6 +216,7 @@ const FactoringMain = () => {
         </button>
 
         <h5 style={{ paddingTop: "50px" }}>Factoring:</h5>
+        <p> <span> {expDate != "" ? ("Expire Date: " + expDate) : ("")} </span></p>
         <p> <span> Interest Rate: {rate} </span></p>
         <p> <span> User ETH: {userEther} </span></p>
         <p> <span> User TFA: {userTokens} </span></p>
@@ -210,9 +227,18 @@ const FactoringMain = () => {
           <p id="status">{status}</p>
         </div>
 
-        <div>
-          <button type="button" class="btn btn-primary" onClick={reload}>Reload</button>
+        <div class="d-grid gap-3">
+          <div>
+            <button type="button" class="btn btn-primary" onClick={reload}>Reload</button>
+          </div>
+          <div>
+            <button type="button" class="btn btn-danger" onClick={reinit}>Restart</button>
+          </div>
         </div>
+
+
+
+
 
 
       </div>

@@ -330,30 +330,6 @@
 				"type": "function"
 			},
 			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "eth",
-						"type": "uint256"
-					}
-				],
-				"name": "LPadded",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
 				"inputs": [],
 				"name": "LPbuyERC",
 				"outputs": [],
@@ -410,68 +386,6 @@
 				"inputs": [],
 				"name": "LPliquidity",
 				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "eth",
-						"type": "uint256"
-					}
-				],
-				"name": "LPpriceForERC",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "tokens",
-						"type": "uint256"
-					}
-				],
-				"name": "LPpriceForETH",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "valor",
-						"type": "uint256"
-					}
-				],
-				"name": "LPsubstracted",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					},
 					{
 						"internalType": "uint256",
 						"name": "",
@@ -579,6 +493,13 @@
 				"type": "function"
 			},
 			{
+				"inputs": [],
+				"name": "restart",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
 				"inputs": [
 					{
 						"internalType": "uint256",
@@ -665,8 +586,8 @@
 			"bytecodeHash": "ipfs"
 		},
 		"optimizer": {
-			"enabled": false,
-			"runs": 200
+			"enabled": true,
+			"runs": 300
 		},
 		"remappings": []
 	},
@@ -704,19 +625,19 @@
 			]
 		},
 		"contracts/AMM.sol": {
-			"keccak256": "0x006944310791ce819564555bda2cc3dabc3e45217631cca7a034e265b4d96cf9",
+			"keccak256": "0x2f8495a9187bedbdcc805feeea85535f71a52a3a8ed3f8fdf4d581392aa9355c",
 			"license": "GPL-3.0",
 			"urls": [
-				"bzz-raw://6c7782875262084423c13b23f22bae439eb2aa691a04c245528b9e91f25ecccd",
-				"dweb:/ipfs/QmScbe5bVZDToRVWwPSRMewZx4HQWYQQwZP3vX2XkCicbG"
+				"bzz-raw://fc267c096363ccdad701950557c45e1e597f991abe089dcf602f55ffe98b9bf4",
+				"dweb:/ipfs/QmVpsifuvV5ZmSSN94aFSnz3BSticowbivbeAnXTQFKaY8"
 			]
 		},
 		"contracts/Factoring.sol": {
-			"keccak256": "0x1e7eb1fad72482cf1fd5a191f84c1d1353d67f00c16d7fed3edb81cf13c75fa0",
+			"keccak256": "0xd36ff0d9f6230b93d95c3f8f82a14c584fdf1c6e1ab7ee9ba6d2ad8e1edd4f23",
 			"license": "GPL-3.0",
 			"urls": [
-				"bzz-raw://bb46ad3492053cbe88b81b37712fae10e8e597d901c2c30c164d733bed62419b",
-				"dweb:/ipfs/QmXwagpuMmrWDpQYZUg4izV769DRupMkNhgu8hkCrsPptK"
+				"bzz-raw://3bfe4cceefd202581a2a4cddb7d0b0d95dfc1812a541e904d199033ee4400a1d",
+				"dweb:/ipfs/QmSkz49rrmZwD2LxGubKu1wBnYUsQWvFbEgkJrvRKThG4i"
 			]
 		},
 		"contracts/Interest.sol": {

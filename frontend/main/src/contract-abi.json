@@ -478,96 +478,6 @@
     "constant": true
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "eth",
-        "type": "uint256"
-      }
-    ],
-    "name": "LPpriceForERC",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "tokens",
-        "type": "uint256"
-      }
-    ],
-    "name": "LPpriceForETH",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "eth",
-        "type": "uint256"
-      }
-    ],
-    "name": "LPadded",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "valor",
-        "type": "uint256"
-      }
-    ],
-    "name": "LPsubstracted",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
     "inputs": [],
     "name": "TFAmybalance",
     "outputs": [
@@ -662,5 +572,12 @@
     "stateMutability": "view",
     "type": "function",
     "constant": true
+  },
+  {
+    "inputs": [],
+    "name": "restart",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   }
 ]

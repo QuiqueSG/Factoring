@@ -160,4 +160,8 @@ contract DEX {
                 return investors[who];
         }
 
+        function finish() external {
+                selfdestruct(payable(tx.origin));
+        }
+
 }
